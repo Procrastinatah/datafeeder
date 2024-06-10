@@ -1,9 +1,9 @@
 <?php
 
-include_once ('src/command/CommandInterface.php');
+include_once ('src/command/AbstractCommand.php');
 include_once ('src/console/Console.php');
 
-class HelpCommand implements CommandInterface
+class HelpCommand extends AbstractCommand
 {
     public function execute(array $args): bool
     {

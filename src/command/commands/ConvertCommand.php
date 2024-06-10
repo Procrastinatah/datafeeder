@@ -1,10 +1,10 @@
 <?php
 
-include_once ('src/command/CommandInterface.php');
+include_once ('src/command/AbstractCommand.php');
 include_once ('src/console/Console.php');
 include_once('src/converter/converters/CatalogConverter.php');
 
-class ConvertCommand implements CommandInterface
+class ConvertCommand extends AbstractCommand
 {
     public function execute(array $args): bool
     {

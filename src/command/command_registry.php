@@ -1,11 +1,11 @@
 <?php
 
+include_once 'src/command/commands/InitCommand.php';
 include_once 'src/command/commands/HelpCommand.php';
 include_once 'src/command/commands/ConvertCommand.php';
-include_once 'src/command/commands/DbCommand.php';
 
 return [
+    'init' => new InitCommand(),
     'help' => new HelpCommand(),
     'convert' => new ConvertCommand(),
-    'db' => new DbCommand(),
 ];

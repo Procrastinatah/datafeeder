@@ -9,17 +9,18 @@ class DatabaseConnector {
 
     public function __construct()
     {
-        $this->conn = $this->connect();
+        $this->connect();
     }
 
-    public function connect(): PDO|bool
+    public function connect(): bool
     {
         try {
             $conn = new PDO('mysql:host=' . Config::HOST . ';dbname=' . Config::DATABASE,
                 Config::USERNAME,
                 Config::PASSWORD);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $conn;
+            $this->conn = $conn;
+            return true;
 
         } catch (PDOException $error) {
             Logger::logError('Connection to database failed', $error);
@@ -32,15 +33,26 @@ class DatabaseConnector {
         $this->conn = null;
     }
 
-    public function execute(string $sql): bool
+    public function execute(string $sql): PDOStatement|bool
     {
         if ($this->conn === null) {
             $this->connect();
         }
         $output = $this->conn->prepare($sql);
-        $output->execute();
-        $this->conn = null;
-        return $output;
+
+        if($output === false){
+            Logger::logError('Could not prepare sql statement', 'could not prepare sql statement: ' . $sql);
+            return false;
+        }
+
+        try{
+            $output->execute();
+            return $output;
+        }
+        catch(PDOException $error){
+            Logger::logError('Error while executing sql statement', 'sql error: ' . $error->getMessage());
+            return false;
+        }
     }
 
 }

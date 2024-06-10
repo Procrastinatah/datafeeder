@@ -2,7 +2,7 @@
 
 include_once ('Color.php');
 include_once ('src/logger/Logger.php');
-include_once ('src/command/CommandInterface.php');
+include_once ('src/command/AbstractCommand.php');
 
 class Console {
     private array $args;

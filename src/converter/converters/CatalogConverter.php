@@ -1,12 +1,13 @@
 <?php
 
 include_once 'src/converter/ConverterInterface.php';
+include_once 'src/converter/DatabaseConverter.php';
 include_once 'src/logger/Logger.php';
 include_once 'src/console/Console.php';
 
 class CatalogConverter implements ConverterInterface
 {
-    public function convert(string $source): Table|false
+    public function convert(string $source): bool
     {
         if (file_exists($source) === false || is_file($source) === false){
             Logger::logError('File could not be found: ' . $source);
@@ -18,18 +19,18 @@ class CatalogConverter implements ConverterInterface
             Logger::logError('Failed to parse XML: ' . $source);
         }
 
+        $databaseConverter = new DatabaseConverter();
+        Console::output('inserting/editing data');
         foreach ($catalog as $item){
-            $mapped = $this->tableMapper($item);
-            foreach ($mapped as $field => $value){
-                Console::output($field .': ' . $value);
+            $mappedItem = $this->mapItem($item);
+            if($databaseConverter->convertData('catalog', 'entity_id', $mappedItem) === false){
+                return false;
             }
-            break;
         }
-
-        return new Table();
+        return true;
     }
 
-    public function tableMapper(SimpleXMLElement $item): array{
+    public function mapItem(SimpleXMLElement $item): array {
         return [
             'entity_id' => $item->entity_id,
             'category_name' => $item->CategoryName,
@@ -37,16 +38,16 @@ class CatalogConverter implements ConverterInterface
             'name' => $item->name,
             'short_description' => $item->shortdesc,
             'description' => $item->description,
-            'price' => $item->price,
+            'price' => (float)$item->price,
             'link' => $item->link,
             'image' => $item->image,
             'brand' => $item->Brand,
-            'rating' => $item->Rating,
+            'rating' => (int)$item->Rating,
             'caffeine_type' => $item->CaffeineType,
-            'count' => $item->Count,
+            'count' => (int)$item->Count,
             'flavored' => $item->Flavored,
             'seasonal' => $item->Seasonal,
-            'instock' => $item->Instock,
+            'in_stock' => $item->Instock,
             'facebook' => $item->Facebook,
             'is_k_cup' => $item->IsKCup,
         ];
