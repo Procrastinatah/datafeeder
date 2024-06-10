@@ -1,0 +1,9 @@
+<?php
+
+include_once('src/console/Console.php');
+global $argv;
+
+$console = new Console($argv);
+$console->run();
+
+
